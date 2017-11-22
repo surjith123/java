@@ -1,0 +1,175 @@
+package org.stock;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "ITEM_ID")
+public class Item {
+	@Id
+	@GeneratedValue
+	@Column(name = "Item_id")
+	private int id;
+	@Column(name = "Item_name")
+	private String name;
+	@Column(name = "Item_quantity")
+	private int quantity;
+	@Column(name = "Item_price")
+	private float price;
+	static int totalNumberOfProducts;
+	static{
+		totalNumberOfProducts=0;
+	}
+
+	public Item() {
+		super();
+	}
+	public int getTotalNumberOfProducts(){
+		return totalNumberOfProducts;
+
+	}
+
+	public Item(int id, String name, int quantity, float price) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.quantity = quantity;
+		this.price = price;
+		totalNumberOfProducts++;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
+}
+
+package org.stock;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+public class Solution2 {
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		SessionFactory sf = new Configuration().configure().buildSessionFactory();
+		Session session = sf.openSession();
+		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+		int id = 0, quantity = 0;
+		String name = null;
+		Float price = 0.0f;
+		
+		while (true) {
+			System.out.println("enter ch");
+			System.out.println("1.read items  2.display items");
+			int ch= Integer.valueOf(bf.readLine());
+			switch (ch) {
+			case 1: {
+				session.beginTransaction();
+				System.out.println("enter id:");
+				id = Integer.valueOf(bf.readLine());
+				System.out.println("Enter Name");
+				name = bf.readLine();
+				System.out.println("Enter quantity");
+				quantity = Integer.valueOf(bf.readLine());
+				System.out.println("Enter price");
+				price = Float.valueOf(bf.readLine());
+				Item item = new Item(id, name, quantity, price);
+				System.out.println(item.getId());
+				System.out.println(item.getName());
+				System.out.println(item.getQuantity());
+				System.out.println(item.getPrice());
+				session.save(item);
+				session.getTransaction().commit();
+				break;
+				//session.close();
+			}
+			case 2: {
+				System.out.println("total number of products inserted :"+Item.totalNumberOfProducts);
+				break;
+			}
+			default:{
+				break;
+			}
+			}
+		}
+
+	}
+
+}
+
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ~ Hibernate, Relational Persistence for Idiomatic Java ~ ~ License: 
+	GNU Lesser General Public License (LGPL), version 2.1 or later. ~ See the 
+	lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>. -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- Database connection settings -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/sample</property>
+		<property name="connection.username">root</property>
+		<property name="connection.password"></property>
+
+		<!-- JDBC connection pool (use the built-in) -->
+		<property name="connection.pool_size">10</property>
+
+		<!-- SQL dialect -->
+		<property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+
+		<!-- Disable the second-level cache -->
+		<property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+
+		<!-- Drop and re-create the database schema on startup -->
+		<property name="hbm2ddl.auto">create</property>
+
+		<!-- Names the annotated entity class -->
+		<mapping class="org.stock.Item" />
+
+	</session-factory>
+
+</hibernate-configuration>
