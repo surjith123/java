@@ -1,0 +1,228 @@
+package org.account;
+
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "account", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("bank")
+public class BankAccount {
+	@Id
+	@GeneratedValue
+	private int accountId;
+	private String  accountName;
+
+	public BankAccount() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(int accountId) {
+		this.accountId = accountId;
+	}
+
+	public String getAccountName() {
+		return accountName;
+	}
+
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+
+}
+
+package org.account;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("current")
+public class CurrentAccount extends BankAccount {
+	private int currentAmount;
+	public CurrentAccount() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getCurrentAmount() {
+		return currentAmount;
+	}
+
+	public void setCurrentAmount(int currentAmount) {
+		this.currentAmount = currentAmount;
+	}
+	
+
+}
+
+package org.account;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("fixed")
+public class FixedDeposit extends BankAccount {
+	private int fixedAmount;
+
+	public FixedDeposit() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getFixedAmount() {
+		return fixedAmount;
+	}
+
+	public void setFixedAmount(int fixedAmount) {
+		this.fixedAmount = fixedAmount;
+	}
+	
+
+}
+
+package org.account;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("loan")
+public class LoanAccount extends BankAccount {
+	private int loanAmount;
+
+	public LoanAccount() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getLoanAmount() {
+		return loanAmount;
+	}
+
+	public void setLoanAmount(int loanAmount) {
+		this.loanAmount = loanAmount;
+	}
+	
+
+}
+
+package org.account;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("savings")
+public class SavingsAccount extends BankAccount {
+	private String savingsType;
+
+	public SavingsAccount() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getSavingsType() {
+		return savingsType;
+	}
+
+	public void setSavingsType(String savingsType) {
+		this.savingsType = savingsType;
+	}
+	
+
+}
+
+package org.account;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+
+public class Solution {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+				SessionFactory sf = new Configuration().configure().buildSessionFactory();
+				Session session = sf.openSession();
+				// BufferedReader bf = new BufferedReader(new
+				// InputStreamReader(System.in));
+				BankAccount bank=new BankAccount();
+				bank.setAccountName("surjith");
+				CurrentAccount current=new CurrentAccount();
+				current.setCurrentAmount(1000);
+				FixedDeposit fixed=new FixedDeposit();
+				fixed.setFixedAmount(2000);
+				LoanAccount loan=new LoanAccount();
+				loan.setLoanAmount(3000);
+				SavingsAccount savings=new SavingsAccount();
+				savings.setSavingsType("new");
+				session.beginTransaction();
+				session.save(bank);
+				session.save(current);
+				session.save(fixed);
+				session.save(loan);
+				session.save(savings);
+				session.getTransaction().commit();
+				session.close();
+
+	}
+
+}
+
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ~ Hibernate, Relational Persistence for Idiomatic Java ~ ~ License: 
+	GNU Lesser General Public License (LGPL), version 2.1 or later. ~ See the 
+	lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>. -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- Database connection settings -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/sample</property>
+		<property name="connection.username">root</property>
+		<property name="connection.password"></property>
+
+		<!-- JDBC connection pool (use the built-in) -->
+		<property name="connection.pool_size">10</property>
+
+		<!-- SQL dialect -->
+		<property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+
+		<!-- Disable the second-level cache -->
+		<property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+
+		<!-- Drop and re-create the database schema on startup -->
+		<property name="hbm2ddl.auto">create</property>
+
+		<!-- Names the annotated entity class -->
+		<mapping class="org.account.BankAccount" />
+		<mapping class="org.account.CurrentAccount" />
+		<mapping class="org.account.FixedDeposit" />
+		<mapping class="org.account.LoanAccount" />
+		<mapping class="org.account.SavingsAccount" />
+
+	</session-factory>
+
+</hibernate-configuration>
